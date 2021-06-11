@@ -2,7 +2,6 @@ package ru.itmo.p3114.s312198.authentication;
 
 import ru.itmo.p3114.s312198.database.DBHelper;
 import ru.itmo.p3114.s312198.exceptions.AuthenticationException;
-import ru.itmo.p3114.s312198.session.Session;
 import ru.itmo.p3114.s312198.transmission.AuthenticationRequest;
 import ru.itmo.p3114.s312198.transmission.User;
 
