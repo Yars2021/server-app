@@ -67,7 +67,7 @@ public class DatabaseCommandExecutor extends CommandExecutor {
                             }
                         case "clear":
                             for (StudyGroup studyGroup : synchronizedCollectionManager.getCollection()) {
-                                if (actor.getId().equals(studyGroup.getId())) {
+                                if (actor.getId().equals(studyGroup.getCreatorId())) {
                                     dbHelper.removeStudyGroupByID(studyGroup.getId());
                                 }
                             }

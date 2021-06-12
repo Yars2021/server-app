@@ -38,7 +38,7 @@ public class DBHelper implements AutoCloseable {
 
     public DBHelper() throws PSQLException {
         Properties properties = new Properties();
-        try (BufferedReader reader = new BufferedReader(new FileReader("D:\\Labs\\lab7\\server-app\\src\\main\\resources\\db.properties"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/home/s312198/semester2/lab72_dir/db.properties"))) {
             properties.load(reader);
         } catch (FileNotFoundException fileNotFoundException) {
             logger.error(fileNotFoundException.getMessage());
@@ -108,7 +108,7 @@ public class DBHelper implements AutoCloseable {
 
     public Long createPerson(Person person) {
         if (person == null) {
-            return 0L;
+            return null;
         } else {
             try (Connection connection = dataSource.getConnection()) {
                 try (PreparedStatement statement = connection.prepareStatement(
@@ -116,7 +116,7 @@ public class DBHelper implements AutoCloseable {
                                 "(id, name, height, color, nationality, " +
                                 "location_x, location_y, " +
                                 "location_z, location_name) " +
-                                "VALUES (nextval('seq_persons'), ?, ?, ?, ?, ?, ?, ?, ?) " +
+                                "VALUES (nextval('seq_person'), ?, ?, ?, ?, ?, ?, ?, ?) " +
                                 "RETURNING id")) {
                     statement.setString(1, person.getName());
                     statement.setLong(2, person.getHeight());
@@ -143,7 +143,7 @@ public class DBHelper implements AutoCloseable {
                 logger.error(sqlException.getMessage());
             }
         }
-        return 0L;
+        return null;
     }
 
     public Long createStudyGroup(StudyGroup studyGroup) {
@@ -164,13 +164,12 @@ public class DBHelper implements AutoCloseable {
                 statement.setInt(6, studyGroup.getShouldBeExpelled());
                 statement.setInt(7, studyGroup.getTransferredStudents());
                 statement.setLong(8, studyGroup.getFormOfEducation().getKey());
-                statement.setLong(9, createPerson(studyGroup.getGroupAdmin()));
+                if (createPerson(studyGroup.getGroupAdmin()) == null) {
+                    statement.setNull(9, Types.INTEGER);
+                } else {
+                    statement.setLong(9, createPerson(studyGroup.getGroupAdmin()));
+                }
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    System.out.println();
-                    System.out.println();
-                    System.out.println(resultSet.getLong(1));
-                    System.out.println();
-                    System.out.println();
                     if (resultSet.next()) {
                         return resultSet.getLong(1);
                     }
@@ -187,6 +186,7 @@ public class DBHelper implements AutoCloseable {
             try (PreparedStatement statement = connection.prepareStatement(
                     "DELETE FROM study_groups WHERE id = ?")) {
                 statement.setLong(1, id);
+                statement.executeQuery();
             }
         } catch (SQLException sqlException) {
             logger.error(sqlException.getMessage());
